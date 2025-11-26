@@ -1,0 +1,46 @@
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+import tensorflow as tf
+
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+from tensorflow.keras import layers, models
+
+print("TensorFlow version:", tf.__version__)
+
+import os, shutil, random
+
+# 원본 데이터셋 경로
+src = "/content/dog_emotion_raw/Dog Emotion"   # 중요!!
+
+# 새로 만들 경로
+base = "/content/dog_emotion"
+
+# 감정 클래스
+classes = ["angry", "happy", "relaxed", "sad"]
+
+# train/val/test 폴더 생성
+for cls in classes:
+    os.makedirs(os.path.join(base, "train", cls), exist_ok=True)
+    os.makedirs(os.path.join(base, "val", cls), exist_ok=True)
+    os.makedirs(os.path.join(base, "test", cls), exist_ok=True)
+
+    files = os.listdir(os.path.join(src, cls))
+    random.shuffle(files)
+
+    train_split = int(len(files) * 0.7)
+    val_split   = int(len(files) * 0.85)
+
+    for i, file in enumerate(files):
+        src_path = os.path.join(src, cls, file)
+
+        if i < train_split:
+            dst = os.path.join(base, "train", cls, file)
+        elif i < val_split:
+            dst = os.path.join(base, "val", cls, file)
+        else:
+            dst = os.path.join(base, "test", cls, file)
+
+        shutil.copy(src_path, dst)
