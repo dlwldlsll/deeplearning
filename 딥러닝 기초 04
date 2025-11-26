@@ -1,0 +1,32 @@
+from tensorflow import keras
+from sklearn.model_selection import train_test_split
+
+(train_input, train_target), (test_input, test_target) = keras.datasets.fashion_mnist.load_data()
+train_scaled = train_input / 255.0
+train_scaled, val_scaled, train_target, val_target = train_test_split(train_scaled, train_target, test_size = 0.2, random_state=42)
+
+# 함수 정의
+def model_fn(a_layer=None):
+  model = keras.Sequential()
+  model.add(keras.layers.Input(shape=(28,28)))
+  model.add(keras.layers.Flatten())
+  model.add(keras.layers.Dense(100, activation='relu'))
+  if a_layer:
+    model.add(a_layer)
+  model.add(keras.layers.Dense(10, activation='softmax'))
+  return model
+
+#모델 훈련 -> 훈련결과를 history 변수에 담기
+model.compile(loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+history = model.fit(train_scaled, train_target, epochs=5, verbose=0) # 에포그 5
+
+# 훈련 측정값이 담겨 있는 history 딕셔너리 확인
+print(history.history.keys())
+
+# history 속성에 포함된 손실 그래프 그리기
+# 에포크 횟수 5
+import matplotlib.pyplot as plt
+plt.plot(history.history['loss'])
+plt.xlabel('epoch')
+plt.ylabel('loss')
+plt.show()
